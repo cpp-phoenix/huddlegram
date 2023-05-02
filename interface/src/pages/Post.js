@@ -87,7 +87,7 @@ function Post() {
     )
 
     return (
-        <div className="flex flex-col items-center justify-center h-5/6 space-y-10">
+        <div className="flex flex-col items-center justify-center h-[710px] space-y-10">
             {videoData ? <video src={objectUrl} width="750" height="500" controls>
             </video> : ""}
             <div className='flex flex-row space-x-2'>

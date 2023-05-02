@@ -36,6 +36,8 @@ function Profile() {
     const [tokenName, setTokenName] = useState("")
     const [tokenSymbol, setTokenSymbol] = useState("")
     const [tokenSupply, setTokenSupply] = useState(0)
+    const [publicPosts, setPublicPosts] = useState([])
+    const [gatedPosts, setGatedPosts] = useState([])
 
     useEffect(() => {
         if(isConnected) {
@@ -43,8 +45,26 @@ function Profile() {
                 (async () => {
                     const data = await (await fetch(`http://127.0.0.1:3001/api/profiles/${address}`,)).json();
                     if(data['data'] != null) {
+                        console.log(data['data'])
                         setData(data['data'])
                         setloggedIn(true)
+
+                        try{
+                            const gatedData = await (await fetch(`http://127.0.0.1:3001/api/posts/gated/${data['data']['_id']}`,)).json();
+                            console.log(gatedData)
+                            setGatedPosts(gatedData['data'])
+                        } catch(error) {
+    
+                        }
+    
+                        try{
+                            const publicData = await (await fetch(`http://127.0.0.1:3001/api/posts/public/${data['data']['_id']}`,)).json();
+                            console.log(publicData)
+                            setPublicPosts(publicData['data'])
+                        } catch(error) {
+                            
+                        }
+
                     }
                     setIsLoading(false)
                 })();
@@ -56,6 +76,28 @@ function Profile() {
             setloggedIn(false)
         }
     },[isConnected])
+
+    const Posts = ({postList}) => {
+        if (postList.length === 0) {
+            return (
+                <div className='flex items-center justify-center h-full'>
+                    No Posts Yet
+                </div>
+            )
+        }
+        return (
+            <div className='grid grid-cols-3 gap-1 h-full'>
+                {postList.map(post => {
+                    const source = "https://" + post['url'];
+                    return (
+                        <div className='rounded-md w-76 h-72 border' key={post['_id']}>
+                            <video src={source} className="w-full h-full" type="video/mp4" controls></video>
+                        </div>
+                    )
+                })}
+            </div>
+        )
+    } 
 
     const uploadToIPFS = async (file) => {
         if(file) {
@@ -121,13 +163,13 @@ function Profile() {
     }
 
     return (
-        <div className="flex flex-1 justify-center h-5/6 overflow-y-scroll">
+        <div className="flex flex-1 justify-center h-[710px] ">
             {
                 isLoading ? <div className='flex items-center'>Loading!!</div> :
                 loggedIn ?
-                <div className='flex w-full flex-col items-center overflow-y-scroll'>
+                <div className='flex w-full flex-col items-center'>
                     <div className='flex flex-col h-72 justify-center'>
-                        <div className='flex flex-rows space-x-10 my-10'>
+                        <div className='flex flex-rows space-x-10 my-10 border'>
                             {/* <div>Profile Picture</div> */}
                             <div>
                                 <div className='flex flex-rows space-x-4'>
@@ -143,17 +185,15 @@ function Profile() {
                         <button className={`h-10 w-24 font-bold ${showPosts === 'public' ? 'border-t-2 border-gray-600 text-gray-900' : 'text-gray-400' } flex justify-center items-center`} onClick = {() => setShowPosts('public')}>POSTS</button>
                         <button className={`h-10 w-24 font-bold ${showPosts === 'gated' ? 'border-t-2 border-gray-600 text-gray-900' : 'text-gray-400' } flex justify-center items-center`} onClick = {() => setShowPosts('gated')}>GATED</button>
                     </div> 
-                    <div>
-                        {
-                        showPosts === 'public' ? 
-                        <div>
-                            public
+                    <div className='w-full flex items-center justify-center overflow-y-scroll h-full'>
+                        <div className='w-8/12 my-4 h-5/6'>
+                            {
+                            showPosts === 'public' ? 
+                            <Posts postList={publicPosts}/>
+                            :
+                            <Posts postList={gatedPosts}/>
+                            }
                         </div>
-                        :
-                        <div>
-                            gated
-                        </div>
-                        }
                     </div>
                 </div>
                 : <div className='flex items-center w-full justify-center'>

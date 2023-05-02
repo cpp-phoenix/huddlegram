@@ -7,11 +7,12 @@ function Navbar () {
             <Link className="font-semibold text-3xl text-blue-500 hover:text-orange-500" to='/'>
                 Huddlegram
             </Link>
-            <div className="space-x-28 text-[#121517]">
-                <Link className="font-semibold text-xl" to='/record'>Record</Link>
-                <Link className="font-semibold text-xl" to='/post'>Post</Link>
-                <Link className="font-semibold text-xl" to='/'>Feed</Link>
-                <Link className="font-semibold text-xl" to='/profile'>Profile</Link>
+            <div className="space-x-20 text-[#121517]">
+                <Link className="font-semibold text-lg" to='/record'>Record</Link>
+                <Link className="font-semibold text-lg" to='/post'>Post</Link>
+                <Link className="font-semibold text-lg" to='/'>Feed</Link>
+                <Link className="font-semibold text-lg" to='/search'>Search</Link>
+                <Link className="font-semibold text-lg" to='/profile'>Profile</Link>
                 {/* <Link className="font-semibold text-lg" to='/stats'>Analytics</Link> */}
             </div>
             <div className="">
