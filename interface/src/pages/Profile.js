@@ -1,24 +1,47 @@
 import { useAccount } from 'wagmi'
 import ClickAwayListener from 'react-click-away-listener';
 import { useEffect, useState } from 'react';
+import { ethers } from 'ethers';
+import { Web3Storage } from 'web3.storage';
+import contractAbi from '../nftABI.json';
+import { useSigner } from "wagmi";
+
+function getAccessToken () {
+    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDIxQzc5Qjk4ZTE1ODIwNWEwNzMzMzM1NzEyZWIwMDRiRjhhN0Q0QzciLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2NjE2MzE4MDAxOTgsIm5hbWUiOiJTY2F0dGVyIn0.H0D97M3xr4g3eP7tn_8URf31vQYz5KrBT2NjB8gZB24";
+}
+
+function makeStorageClient () {
+    return new Web3Storage({ token: getAccessToken() })
+}
+
+async function storeFiles(files) {
+    const client = makeStorageClient()
+    const cid = await client.put(files)
+    return cid
+}
 
 function Profile() {
+    const { data: signer, isError } = useSigner();
     const { address, isConnected } = useAccount()
     const [isLoading, setIsLoading] = useState(true)
     const [loggedIn, setloggedIn] = useState(false)
     const [showLoginPopup, setShowLoginPopup] = useState(false)
     const [name, setName] = useState("")
     const [desc, setDesc] = useState("")
-    const [pic, setPic] = useState()
+    const [pic, setPic] = useState(null)
+    const [nft, setNft] = useState(null)
     const [data, setData] = useState({})
     const [showPosts, setShowPosts] = useState("public")
+    const [contentCost, setContentCost] = useState(0)
+    const [tokenName, setTokenName] = useState("")
+    const [tokenSymbol, setTokenSymbol] = useState("")
+    const [tokenSupply, setTokenSupply] = useState(0)
+
     useEffect(() => {
-        console.log(process.env.STORAGE_API_KEY)
         if(isConnected) {
             try {
                 (async () => {
                     const data = await (await fetch(`http://127.0.0.1:3001/api/profiles/${address}`,)).json();
-                    console.log(data['data'])
                     if(data['data'] != null) {
                         setData(data['data'])
                         setloggedIn(true)
@@ -34,11 +57,36 @@ function Profile() {
         }
     },[isConnected])
 
+    const uploadToIPFS = async (file) => {
+        if(file) {
+            let files = [];
+            files.push(file);
+            let ipfsLink = await storeFiles(files);
+            const url = ipfsLink + ".ipfs.w3s.link/" + file.name
+            return url
+
+        } else {
+            return ""
+        }
+    }
 
     const saveProfile = async () => {
-        console.log(name, desc, pic)
         setShowLoginPopup(false)
         setIsLoading(true)
+
+        console.log(name, desc, pic, nft)
+
+        const picIpfs = await uploadToIPFS(pic)
+        const nftIpfs = await uploadToIPFS(nft)
+
+        console.log(picIpfs)
+        console.log(nftIpfs)
+
+        const factory = new ethers.ContractFactory(contractAbi.abi, contractAbi.bytecode, signer);
+        const contract = await factory.deploy(tokenSupply, tokenName, tokenSymbol, nftIpfs);
+        await contract.deployed();
+        console.log(contract.address)
+
         try {
             (async () => {
                 const requestOptions = {
@@ -48,9 +96,14 @@ function Profile() {
                         "Access-Control-Allow-Origin": "*",
                     },
                     body: JSON.stringify({
-                        'name': name,
+                        "_id": address,
+                        "picture": picIpfs,
                         'description': desc,
-                        "_id": address
+                        'name': name,
+                        'contentCost': contentCost,
+                        'nftContract': contract.address,
+                        'nftArtIpfs': nftIpfs,
+                        'maxSupply': tokenSupply
                     })
                 };
                 const data = await (await fetch('http://127.0.0.1:3001/api/profiles/',requestOptions)).json();
@@ -108,12 +161,12 @@ function Profile() {
                         {
                             showLoginPopup && (
                                 <ClickAwayListener onClickAway={() => setShowLoginPopup(false)}>
-                                    <div className='rounded-lg border border-cyan-500 popup absolute bg-white p-4 text-xl space-y-2'>
-                                        {/* <div className='flex flex-row space-x-2'>
-                                            <div>Picture</div>
+                                    <div className='rounded-lg border border-cyan-500 popup absolute bg-white p-4 text-xl space-y-4'>
+                                        <div className='flex flex-row space-x-2'>
+                                            <div className='text-lg'>Profile Picture</div>
                                             <label className="block">
                                                 <span className="sr-only">Choose profile photo</span>
-                                                <input onChange={(e) => {setPic(e.target.value)}} type="file" accept="image/png, image/jpeg" className="block w-full text-sm text-slate-500
+                                                <input onChange={(e) => {setPic(e.target.files[0])}} type="file" accept="image/png, image/jpeg" className="block w-full text-sm text-slate-500
                                                 file:mr-4 file:py-2 file:px-4
                                                 file:rounded-full file:border-0
                                                 file:text-sm file:font-semibold
@@ -121,14 +174,43 @@ function Profile() {
                                                 hover:file:bg-violet-100
                                                 "/>
                                             </label>
-                                        </div> */}
+                                        </div>
                                         <div className='flex flex-row space-x-2'>
-                                            <div>Name</div>
+                                            <div className='text-lg'>Name</div>
                                             <input onChange={(e) => {setName(e.target.value)}} type="text" className='border border-slate-300 rounded-sm text-sm shadow-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500' />
                                         </div>
                                         <div className='flex flex-row space-x-2'>
-                                            <div>Description</div>
+                                            <div className='text-lg'>Description</div>
                                             <input onChange={(e) => {setDesc(e.target.value)}} type="text" className='border border-slate-300 rounded-sm text-sm shadow-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500' />
+                                        </div>
+                                        <div className='flex flex-row space-x-2'>
+                                            <div className='text-lg'>NFT Art</div>
+                                            <label className="block">
+                                                <span className="sr-only">Choose profile photo</span>
+                                                <input onChange={(e) => {setNft(e.target.files[0])}} type="file" accept="image/png, image/jpeg" className="block w-full text-sm text-slate-500
+                                                file:mr-4 file:py-2 file:px-4
+                                                file:rounded-full file:border-0
+                                                file:text-sm file:font-semibold
+                                                file:bg-violet-50 file:text-violet-700
+                                                hover:file:bg-violet-100
+                                                "/>
+                                            </label>
+                                        </div>
+                                        <div className='flex flex-row space-x-2'>
+                                            <div className='text-lg'>Token Name</div>
+                                            <input onChange={(e) => {setTokenName(e.target.value)}} type="text" className='border border-slate-300 rounded-sm text-sm shadow-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500' />
+                                        </div>
+                                        <div className='flex flex-row space-x-2'>
+                                            <div className='text-lg'>Token Symbol</div>
+                                            <input onChange={(e) => {setTokenSymbol(e.target.value)}} type="text" className='border border-slate-300 rounded-sm text-sm shadow-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500' />
+                                        </div>
+                                        <div className='flex flex-row space-x-2'>
+                                            <div className='text-lg'>Total Supply</div>
+                                            <input onChange={(e) => {setTokenSupply(e.target.value)}} type="number" className='border border-slate-300 rounded-sm text-sm shadow-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500' />
+                                        </div>
+                                        <div className='flex flex-row space-x-2'>
+                                            <div className='text-lg'>Gated Content Cost</div>
+                                            <input onChange={(e) => {setContentCost(e.target.value)}} type="number" className='border border-slate-300 rounded-sm text-sm shadow-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500' />
                                         </div>
                                         <div className='flex flex-rows justify-center space-x-4'>
                                             <button className='mt-2 rounded-lg px-4 py-2 border bg-blue-500 hover:bg-blue-600 text-white' onClick={() => saveProfile()}>Submit</button>
@@ -140,7 +222,6 @@ function Profile() {
                         }
                     </div>
             }
-            
         </div>
     )
 }

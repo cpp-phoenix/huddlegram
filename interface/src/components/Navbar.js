@@ -9,6 +9,7 @@ function Navbar () {
             </Link>
             <div className="space-x-28 text-[#121517]">
                 <Link className="font-semibold text-xl" to='/record'>Record</Link>
+                <Link className="font-semibold text-xl" to='/post'>Post</Link>
                 <Link className="font-semibold text-xl" to='/'>Feed</Link>
                 <Link className="font-semibold text-xl" to='/profile'>Profile</Link>
                 {/* <Link className="font-semibold text-lg" to='/stats'>Analytics</Link> */}

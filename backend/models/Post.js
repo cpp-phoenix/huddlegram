@@ -2,9 +2,10 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
  
 const postSchema = new Schema({
-  _id: String,
+  id: String,
   gated: Boolean,
   url: String,
+  nftContract: String,
   createdAt: {
     type: Date,
     default: Date.now,

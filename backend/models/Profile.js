@@ -7,7 +7,9 @@ const profileSchema = new Schema({
   description: String,
   name: String,
   contentCost: String,
-  optedForGated: Boolean,
+  nftContract: String,
+  nftArtIpfs: String,
+  maxSupply: String,
   createdAt: {
     type: Date,
     default: Date.now,
