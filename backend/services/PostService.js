@@ -5,19 +5,19 @@ exports.getAllPosts = async () => {
 };
 
 exports.getAllPublicPosts = async () => {
-  return await PostModel.find({gated: false});
+  return await PostModel.find({gated: false}).sort({createdAt: -1});
 };
 
 exports.getAllPublicPostsById = async (id) => {
-  return await PostModel.find({gated: false, id:id});
+  return await PostModel.find({gated: false, id:id}).sort({createdAt: -1});
 };
 
 exports.getAllGatedPosts = async () => {
-  return await PostModel.find({gated: true});
+  return await PostModel.find({gated: true}).sort({createdAt: -1});
 };
 
 exports.getAllGatedPostsById = async (id) => {
-  return await PostModel.find({gated: true, id:id});
+  return await PostModel.find({gated: true, id:id}).sort({createdAt: -1});
 };
  
 exports.createPost = async (post) => {

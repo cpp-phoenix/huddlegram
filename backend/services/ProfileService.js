@@ -4,6 +4,10 @@ exports.getAllProfiles = async () => {
   return await ProfileModel.find();
 };
  
+exports.getProfileByUsername = async (username) => {
+  return await ProfileModel.find({name:username});
+};
+
 exports.createProfile = async (profile) => {
   return await ProfileModel.create(profile);
 };

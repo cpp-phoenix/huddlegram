@@ -21,7 +21,7 @@ async function storeFiles(files) {
 }
 
 function Profile() {
-    const { data: signer, isError } = useSigner();
+    const { data: signer, isError } = useSigner()
     const { address, isConnected } = useAccount()
     const [isLoading, setIsLoading] = useState(true)
     const [loggedIn, setloggedIn] = useState(false)
@@ -88,7 +88,7 @@ function Profile() {
         return (
             <div className='grid grid-cols-3 gap-1 h-full'>
                 {postList.map(post => {
-                    const source = "https://" + post['url'];
+                    const source = post['url'];
                     return (
                         <div className='rounded-md w-76 h-72 border' key={post['_id']}>
                             <video src={source} className="w-full h-full" type="video/mp4" controls></video>
@@ -104,7 +104,7 @@ function Profile() {
             let files = [];
             files.push(file);
             let ipfsLink = await storeFiles(files);
-            const url = ipfsLink + ".ipfs.w3s.link/" + file.name
+            const url = "https://" + ipfsLink + ".ipfs.w3s.link/" + file.name
             return url
 
         } else {
@@ -125,7 +125,7 @@ function Profile() {
         console.log(nftIpfs)
 
         const factory = new ethers.ContractFactory(contractAbi.abi, contractAbi.bytecode, signer);
-        const contract = await factory.deploy(tokenSupply, tokenName, tokenSymbol, nftIpfs);
+        const contract = await factory.deploy(tokenSupply, tokenName, tokenSymbol, ethers.utils.parseUnits(contentCost.toString(), "ether"), nftIpfs);
         await contract.deployed();
         console.log(contract.address)
 
@@ -169,21 +169,36 @@ function Profile() {
                 loggedIn ?
                 <div className='flex w-full flex-col items-center'>
                     <div className='flex flex-col h-72 justify-center'>
-                        <div className='flex flex-rows space-x-10 my-10 border'>
-                            {/* <div>Profile Picture</div> */}
-                            <div>
+                        <div className='flex flex-rows space-x-20 my-10 items-center'>
+                            <div className='border border-2 rounded-full w-40 h-40 p-1'>
+                                <img src={data["picture"]}  className='rounded-full w-full h-full'/>
+                            </div>
+                            <div className='space-y-2'>
                                 <div className='flex flex-rows space-x-4'>
-                                    <div>Username: </div>
-                                    <div>{data['name'] !==null ? data['name']: 'username not found'}</div>
+                                    {/* <div>Username: </div> */}
+                                    <div className='font-semibold text-xl'>{data['name'] !==null ? data['name']: 'username not found'}</div>
                                     {/* <button className='rounded-lg border bg-blue-500 text-white px-2 py-2' onClick={() => setShowLoginPopup(true)}>Edit Profile</button> */}
                                 </div>
-                                <div>Description: {data['description'] !==null ? data['description']: 'description not found'}</div>
+                                <div className='flex flex-row space-x-2 font-medium'>
+                                    <div>{data['maxSupply']} nfts</div>
+                                    <div>{data['contentCost']}/nft</div>
+                                </div>
+                                <div className='flex flex-col'>
+                                    <div className='text-sm font-semibold'>Description</div>
+                                    <div className='text-sm '>{data['description'] !==null ? data['description']: 'description not found'}</div>
+                                </div>
                             </div>
                         </div>
                     </div> 
-                    <div className='flex flex-rows w-full border-t justify-center space-x-20'>
-                        <button className={`h-10 w-24 font-bold ${showPosts === 'public' ? 'border-t-2 border-gray-600 text-gray-900' : 'text-gray-400' } flex justify-center items-center`} onClick = {() => setShowPosts('public')}>POSTS</button>
-                        <button className={`h-10 w-24 font-bold ${showPosts === 'gated' ? 'border-t-2 border-gray-600 text-gray-900' : 'text-gray-400' } flex justify-center items-center`} onClick = {() => setShowPosts('gated')}>GATED</button>
+                    <div className='flex flex-rows w-8/12 border-t justify-center space-x-20'>
+                        <button className={`pt-2 h-10 w-24 font-bold ${showPosts === 'public' ? 'border-t-2 border-gray-600 text-gray-900' : 'text-gray-400' } flex justify-center items-center`} onClick = {() => setShowPosts('public')}>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="28" viewBox="0 96 960 960" width="28"><path d="M200 936V271q0-24 18-42t42-18h440q24 0 42 18t18 42v665L480 816 200 936Zm60-91 220-93 220 93V271H260v574Zm0-574h440-440Z"/></svg>
+                            POSTS
+                        </button>
+                        <button className={`pt-2 h-10 w-24 font-bold ${showPosts === 'gated' ? 'border-t-2 border-gray-600 text-gray-900' : 'text-gray-400' } flex justify-center items-center`} onClick = {() => setShowPosts('gated')}>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="28" viewBox="0 96 960 960" width="28"><path d="m385 644 36-115-95-74h116l38-119 37 119h117l-95 74 35 115-94-71-95 71Zm-141 372V712q-45-47-64.5-103T160 496q0-136 92-228t228-92q136 0 228 92t92 228q0 57-19.5 113T716 712v304l-236-79-236 79Zm236-260q109 0 184.5-75.5T740 496q0-109-75.5-184.5T480 236q-109 0-184.5 75.5T220 496q0 109 75.5 184.5T480 756ZM304 932l176-55 176 55V761q-40 29-86 42t-90 13q-44 0-90-13t-86-42v171Zm176-86Z"/></svg>
+                            GATED
+                        </button>
                     </div> 
                     <div className='w-full flex items-center justify-center overflow-y-scroll h-full'>
                         <div className='w-8/12 my-4 h-5/6'>
@@ -216,7 +231,7 @@ function Profile() {
                                             </label>
                                         </div>
                                         <div className='flex flex-row space-x-2'>
-                                            <div className='text-lg'>Name</div>
+                                            <div className='text-lg'>Username</div>
                                             <input onChange={(e) => {setName(e.target.value)}} type="text" className='border border-slate-300 rounded-sm text-sm shadow-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500' />
                                         </div>
                                         <div className='flex flex-row space-x-2'>

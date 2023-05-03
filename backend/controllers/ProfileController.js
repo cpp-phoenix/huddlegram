@@ -12,6 +12,19 @@ exports.getAllProfiles = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.getProfileByUsername = async (req, res) => {
+  try {
+    const profiles = await profileService.getProfileByUsername(req.params.username);
+    res.set({
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+    })
+    res.json({ data: profiles, status: "success" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
  
 exports.createProfile = async (req, res) => {
   try {
