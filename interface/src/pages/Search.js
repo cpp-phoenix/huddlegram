@@ -182,7 +182,7 @@ function Search() {
 
     return (
         <div className="flex flex-col items-center w-full h-[710px]">
-            <div className="flex flex-row space-x-4 my-4">
+            <div className="flex flex-row space-x-4 my-4 ">
                 <label class="relative block">
                     <span class="sr-only">Search</span>
                     <span class="absolute inset-y-0 left-0 flex items-center pl-2">
