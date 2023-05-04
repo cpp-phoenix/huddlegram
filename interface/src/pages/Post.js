@@ -33,7 +33,7 @@ function Post() {
         if(isConnected) {
             try {
                 (async () => {
-                    const data = await (await fetch(`http://127.0.0.1:3001/api/profiles/${address}`,)).json();
+                    const data = await (await fetch(`https://huddlegram-backend.onrender.com/api/profiles/${address}`,)).json();
                     if(data['data'] != null) {
                         setData(data['data'])
                         setloggedIn(true)
@@ -66,7 +66,7 @@ function Post() {
             console.log("Url: ", url);
             try{
                 const response = await axios.post(
-                    'http://127.0.0.1:3001/api/posts',
+                    'https://huddlegram-backend.onrender.com/api/posts',
                     {
                         id: address,
                         gated: gated,

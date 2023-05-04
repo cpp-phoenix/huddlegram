@@ -46,7 +46,7 @@ function Profile() {
         if(isConnected) {
             try {
                 (async () => {
-                    const data = await (await fetch(`http://127.0.0.1:3001/api/profiles/${address}`,)).json();
+                    const data = await (await fetch(`https://huddlegram-backend.onrender.com/api/profiles/${address}`,)).json();
                     if(data['data'] != null) {
                         // alert.info(<div>Login success</div>, {
                         //     timeout: 4000,
@@ -57,7 +57,7 @@ function Profile() {
                         setloggedIn(true)
 
                         try{
-                            const gatedData = await (await fetch(`http://127.0.0.1:3001/api/posts/gated/${data['data']['_id']}`,)).json();
+                            const gatedData = await (await fetch(`https://huddlegram-backend.onrender.com/api/posts/gated/${data['data']['_id']}`,)).json();
                             console.log(gatedData)
                             setGatedPosts(gatedData['data'])
                         } catch(error) {
@@ -65,17 +65,17 @@ function Profile() {
                         }
     
                         try{
-                            const publicData = await (await fetch(`http://127.0.0.1:3001/api/posts/public/${data['data']['_id']}`,)).json();
+                            const publicData = await (await fetch(`https://huddlegram-backend.onrender.com/api/posts/public/${data['data']['_id']}`,)).json();
                             console.log(publicData)
                             setPublicPosts(publicData['data'])
                         } catch(error) {
                             
                         }
                     } else {
-                        alert.info(<div>Please login</div>, {
-                            timeout: 4000,
-                            position: positions.BOTTOM_RIGHT
-                        });
+                        // alert.info(<div>Please login</div>, {
+                        //     timeout: 4000,
+                        //     position: positions.BOTTOM_RIGHT
+                        // });
                     }
                     setIsLoading(false)
                 })();
@@ -186,7 +186,7 @@ function Profile() {
                         'maxSupply': tokenSupply
                     })
                 };
-                const data = await (await fetch('http://127.0.0.1:3001/api/profiles/',requestOptions)).json();
+                const data = await (await fetch('https://huddlegram-backend.onrender.com/api/profiles/',requestOptions)).json();
                 console.log(data['data'])
                 if(data['data'] != null) {
                     setData(data['data'])

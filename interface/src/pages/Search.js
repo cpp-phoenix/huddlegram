@@ -26,7 +26,7 @@ function Search() {
         if(isConnected) {
             try {
                 (async () => {
-                    const data = await (await fetch(`http://127.0.0.1:3001/api/profiles/${address}`,)).json();
+                    const data = await (await fetch(`https://huddlegram-backend.onrender.com/api/profiles/${address}`,)).json();
                     if(data['data'] != null) {
                         setMyData(data['data'])
                         setloggedIn(true)
@@ -47,7 +47,7 @@ function Search() {
     useEffect(() => {
         if(gatedAccess) {
             (async () => {
-                const gatedData = await (await fetch(`http://127.0.0.1:3001/api/posts/gated/${profileData['_id']}`,)).json();
+                const gatedData = await (await fetch(`https://huddlegram-backend.onrender.com/api/posts/gated/${profileData['_id']}`,)).json();
                 console.log(gatedData)
                 setGatedPosts(gatedData['data'])
             })();
@@ -81,7 +81,7 @@ function Search() {
         setLoading(true)
         setGatedPosts([])
         try{
-            const publicData = await (await fetch(`http://127.0.0.1:3001/api/profiles/username/${searchKey}`,)).json();
+            const publicData = await (await fetch(`https://huddlegram-backend.onrender.com/api/profiles/username/${searchKey}`,)).json();
             const profiles = publicData['data']
             console.log(profiles)
             if(profiles.length === 0) {
@@ -93,7 +93,7 @@ function Search() {
             } else {
                 console.log("Profile data here: ", profiles[0])
                 setProfileData(profiles[0])
-                const publicData = await (await fetch(`http://127.0.0.1:3001/api/posts/public/${profiles[0]['_id']}`,)).json();
+                const publicData = await (await fetch(`https://huddlegram-backend.onrender.com/api/posts/public/${profiles[0]['_id']}`,)).json();
                 console.log(publicData)
                 setPublicPosts(publicData['data'])
                 console.log(publicData['data'])

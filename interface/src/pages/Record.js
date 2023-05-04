@@ -30,7 +30,7 @@ function Record() {
         if(isConnected) {
             try {
                 (async () => {
-                    const data = await (await fetch(`http://127.0.0.1:3001/api/profiles/${address}`,)).json();
+                    const data = await (await fetch(`https://huddlegram-backend.onrender.com/api/profiles/${address}`,)).json();
                     if(data['data'] != null) {
                         try{
                             const response = await axios.post(

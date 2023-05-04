@@ -11,7 +11,7 @@ function Main() {
     useEffect(() => {
         try {
             (async () => {
-                const publicData = await (await fetch(`http://127.0.0.1:3001/api/posts/public/`,)).json();
+                const publicData = await (await fetch(`https://huddlegram-backend.onrender.com/api/posts/public/`,)).json();
                 console.log(publicData)
                 setPublicPosts(publicData['data'])
                 setLoading(false)
