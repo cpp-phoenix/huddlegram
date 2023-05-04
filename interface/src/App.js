@@ -7,7 +7,6 @@ import {
 import { configureChains, createClient, WagmiConfig } from 'wagmi';
 import { filecoinHyperspace } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
-
 import Main from './pages/Main';
 import Profile from './pages/Profile';
 import Navbar from './components/Navbar';
@@ -31,22 +30,22 @@ const client = createClient({
 
 function App() {
   return (
-    <WagmiConfig client={client}>
-      <RainbowKitProvider chains={chains}>
-        <div className="w-screen h-screen">
-          <Router>
-            <Navbar/>
-            <Routes>
-              <Route path='/' exact element={<Main/>} />
-              <Route path='/profile' exact element={<Profile/>} />
-              <Route path='/record' exact element={<Record/>} />
-              <Route path='/post' exact element={<Post/>} />
-              <Route path='/search' exact element={<Search/>} />
-            </Routes>
-          </Router>
-        </div>
-      </RainbowKitProvider>
-    </WagmiConfig>
+      <WagmiConfig client={client}>
+        <RainbowKitProvider chains={chains}>
+          <div className="w-screen h-screen bg-black">
+            <Router>
+              <Navbar/>
+              <Routes>
+                <Route path='/' exact element={<Main/>} />
+                <Route path='/profile' exact element={<Profile/>} />
+                <Route path='/record' exact element={<Record/>} />
+                <Route path='/post' exact element={<Post/>} />
+                <Route path='/search' exact element={<Search/>} />
+              </Routes>
+            </Router>
+          </div>
+        </RainbowKitProvider>
+      </WagmiConfig>
   );
 }
 

@@ -5,6 +5,9 @@ const postSchema = new Schema({
   id: String,
   gated: Boolean,
   url: String,
+  picture: String,
+  name: String,
+  description: String,
   nftContract: String,
   createdAt: {
     type: Date,
